@@ -9,16 +9,21 @@ class EchoServer < EM::Connection
   end
 
   def post_init
-    puts "-- someone connected to the echo server!"
+    @username = "Guest #{rand(0..999)}"
     add_client
+
+    push_to_everyone("#{@username} connected to the echo server!")
   end
 
   def receive_data input
-    p [self, input]
+    begin
+      data = JSON.parse(input)
+    rescue JSON::ParserError
+      raise input.inspect
+    end
 
-    data = JSON.parse(input)
+    p [self, data]
 
-    p data
     case data["command"]
     when "set_username"
       old_username = @username
@@ -29,7 +34,7 @@ class EchoServer < EM::Connection
         push_to_everyone("New user registered: #{@username}")
       end
     when "say"
-      push_to_others(data[:message])
+      push_to_others("#{@username}: #{data["message"]}")
     end
   end
 
