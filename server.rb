@@ -20,14 +20,23 @@ class Persistance
     "messages.log"
   end
 
-
   check_okay
 
   def self.write(string)
-
     File.open(path + file, "a") do |file|
       file.write(string.to_json+"\n")
     end
+  end
+
+  def self.read
+    file = File.open(path + self.file, "r")
+    result = []
+    file.each_line do |line|
+      result << JSON.parse(line)
+    end
+    file.close
+
+    result
   end
 end
 
@@ -47,7 +56,9 @@ class EchoServer < EM::Connection
     message = "#{@username} connected to the echo server!"
 
     log(message: message)
-    push_to_everyone(message)
+    push(message)
+
+    push_to_me(@@persistance_class.read)
   end
 
   def receive_data input
@@ -56,6 +67,8 @@ class EchoServer < EM::Connection
     rescue JSON::ParserError
       raise input.inspect
     end
+
+    data = data.merge(username: username)
 
     p [self, data]
 
@@ -66,17 +79,21 @@ class EchoServer < EM::Connection
       old_username = @username
       @username = data["arguments"][0]
       if old_username
-        push_to_everyone("#{old_username} changed name to #{@username}")
+        say("#{old_username} changed name to #{@username}")
       else
-        push_to_everyone("New user registered: #{@username}")
+        say("New user registered: #{@username}")
       end
     when "say"
-      push_to_others("#{@username}: #{data["message"]}")
+      push(data)
     end
   end
 
+  def say(what)
+    push(command: "say", message: what, username: @username)
+  end
+
   def log(data)
-    @@persistance_class.write(data.merge(username: username))
+    @@persistance_class.write(data)
   end
 
   def add_client
@@ -84,15 +101,15 @@ class EchoServer < EM::Connection
     @@clients << self
   end
 
-  def push_to_everyone(data)
+  def push(message)
     @@clients.each do |instance|
-      instance.send_data(data)
+      instance.send_data(message.to_json)
     end
   end
 
-  def push_to_others(data)
-    @@clients.reject { |c| c == self }.each do |instance|
-      instance.send_data(data)
+  def push_to_me(data)
+    data.each do |message|
+      send_data(message.to_json)
     end
   end
 

@@ -20,7 +20,7 @@ class Echo < EM::Connection
   end
 
   def receive_data(data)
-    p data
+    print data
   end
 end
 
