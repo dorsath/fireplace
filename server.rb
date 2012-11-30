@@ -44,7 +44,10 @@ class EchoServer < EM::Connection
     @username = "Guest #{rand(0..999)}"
     add_client
 
-    push_to_everyone("#{@username} connected to the echo server!")
+    message = "#{@username} connected to the echo server!"
+
+    log(message: message)
+    push_to_everyone(message)
   end
 
   def receive_data input
