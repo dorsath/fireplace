@@ -19,9 +19,21 @@ class Echo < EM::Connection
     # send_data('Hello')
   end
 
-  def receive_data(data)
-    print data
+  def receive_data(input)
+    input.split("\n").each do |line|
+      process_command(JSON.parse(line))
+    end
   end
+
+  def process_command(data)
+    case data["command"]
+    when "say"
+      print "#{data["username"]}: #{data["message"]}\n"
+    else 
+      print "unknown command: #{data}"
+    end
+  end
+
 end
 
 class KeyboardHandler < EM::Connection
@@ -53,6 +65,6 @@ end
 EM.run {
   q = EM::Queue.new
 
-  EM.connect('127.0.0.1', 8081, Echo, q)
+  EM.connect("194.111.30.153", 8081, Echo, q)
   EM.open_keyboard(KeyboardHandler, q)
 }

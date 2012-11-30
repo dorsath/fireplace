@@ -40,7 +40,7 @@ class Persistance
   end
 end
 
-class EchoServer < EM::Connection
+class Fireplace < EM::Connection
   attr_accessor :username
   
   def self.persistance(persistance_class)
@@ -53,12 +53,15 @@ class EchoServer < EM::Connection
     @username = "Guest #{rand(0..999)}"
     add_client
 
-    message = "#{@username} connected to the echo server!"
+    message = {command: "say", username: @username, message: "has entered the room"}
 
-    log(message: message)
+    @@persistance_class.read.each do |line|
+      push_to_me(line)
+    end
+
     push(message)
 
-    push_to_me(@@persistance_class.read)
+    log(message)
   end
 
   def receive_data input
@@ -107,16 +110,18 @@ class EchoServer < EM::Connection
     end
   end
 
-  def push_to_me(data)
-    data.each do |message|
-      send_data(message.to_json)
-    end
+  def push_to_me(message)
+    send_data(message.to_json)
+  end
+
+  def send_data(data)
+    super(data + "\n")
   end
 
 end
 
 EventMachine::run {
-  EventMachine::start_server "127.0.0.1", 8081, EchoServer
+  EventMachine::start_server "194.111.30.153", 8081, Fireplace
   puts 'running echo server on 8081'
 }
 
