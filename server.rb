@@ -1,12 +1,44 @@
 require 'eventmachine'
 require 'json'
+require 'fileutils'
+
+class Persistance
+  attr_reader :path, :file
+
+  def self.check_okay
+    unless File.exist?(path+file)
+      Dir.mkdir(path) unless File.directory?(path)
+      FileUtils.touch(path+file)
+    end
+  end
+
+  def self.path
+    "./data/"
+  end
+
+  def self.file
+    "messages.log"
+  end
+
+
+  check_okay
+
+  def self.write(string)
+
+    File.open(path + file, "a") do |file|
+      file.write(string.to_json+"\n")
+    end
+  end
+end
 
 class EchoServer < EM::Connection
   attr_accessor :username
-
-  def self.clients
-    @clients ||= []
+  
+  def self.persistance(persistance_class)
+    @@persistance_class = persistance_class
   end
+
+  persistance Persistance
 
   def post_init
     @username = "Guest #{rand(0..999)}"
@@ -24,6 +56,8 @@ class EchoServer < EM::Connection
 
     p [self, data]
 
+    log(data)
+
     case data["command"]
     when "set_username"
       old_username = @username
@@ -36,6 +70,10 @@ class EchoServer < EM::Connection
     when "say"
       push_to_others("#{@username}: #{data["message"]}")
     end
+  end
+
+  def log(data)
+    @@persistance_class.write(data.merge(username: username))
   end
 
   def add_client
