@@ -42,7 +42,7 @@ end
 
 class Fireplace < EM::Connection
   attr_accessor :username
-  
+
   def self.persistance(persistance_class)
     @@persistance_class = persistance_class
   end
@@ -121,7 +121,7 @@ class Fireplace < EM::Connection
 end
 
 EventMachine::run {
-  EventMachine::start_server "194.111.30.153", 8081, Fireplace
+  EventMachine::start_server "127.0.0.1", 8081, Fireplace
   puts 'running echo server on 8081'
 }
 
