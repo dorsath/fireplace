@@ -46,7 +46,6 @@ class KeyboardHandler < EM::Connection
   end
 
   def receive_line(data)
-
     @queue.push(format_input(data).to_json)
   end
 

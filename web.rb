@@ -25,6 +25,6 @@ get '/stream' do
 end
 
 post "/speak" do
-
+  connections[request.ip].send_message(params[:message])
 end
 

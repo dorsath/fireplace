@@ -30,10 +30,11 @@ end
 class Client
   def initialize(out)
     @out = Out.new(out)
+    @q = EM::Queue.new
     EM.run {
-      q = EM::Queue.new
 
-      EM.connect("127.0.0.1", 8081, Echo, q, @out)
+
+      EM.connect("127.0.0.1", 8081, Echo, @q, @out)
     }
   end
 
@@ -41,8 +42,24 @@ class Client
     @out.add_out(new_out)
   end
 
+  def send_message(message)
+    @q.push(format_input(message).to_json)
+  end
+
   def remove_out(out)
     @out.remove_out(out)
+  end
+
+
+
+
+  def format_input(data)
+    if data[0] == "/"
+      command, *arguments = data[1..-1].split(/ /)
+      {command: command, arguments: arguments}
+    else
+      {command: "say", message: data}
+    end
   end
 end
 

@@ -3,8 +3,11 @@
 #sidebar
   #inner
     %h1 Fireplace
-    %h2 A simple chat client
+    %h2 A simple chat client?
 #chat.clearfix
+%form#chat-input(action="/speak" method="post")
+  %textarea(name="message")
+  %input(type='submit')
 
 :javascript
   var es = new EventSource('/stream');
@@ -15,3 +18,22 @@
       $("html, body").animate({ scrollTop: $(document).height() }, 0);
     }
   }
+
+  $(document).ready(function() {
+    $('#chat-input textarea').keydown(function() {
+        if (event.keyCode == 13) {
+            $('#chat-input').submit();
+            return false;
+         }
+    });
+
+    $('#chat-input').submit(function() {
+      $.ajax({
+        type: 'POST',
+        url: $(this).attr("action"),
+        data: $(this).serialize()
+      });
+      $('#chat-input textarea').val('');
+      return false;
+    });
+  });
