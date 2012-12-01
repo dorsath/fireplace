@@ -96,34 +96,65 @@ textarea {
 body {
   width: 960px;
   margin: 30px auto;
-  background-color: #E5E5E5;
+  background-color: #e9e9e9;
   font-family: helvetica;
+  position: relative;
+}
+
+#sidebar {
+  float: right;
+  width: 960px;
+  position: fixed;
+}
+
+h1 {
+  margin-bottom: 0px;
+  color: #1F3642;
+}
+
+h2 {
+  margin-top: 0px;
+  font-size: 14px;
+  color: #6D968D;
+}
+
+#inner {
+  width: 200px;
+  float: right;
 }
 
 #chat {
   background-color: #FFFFFF;
   box-shadow: 2px 2px 4px #999;
   padding: 15px;
+  width: 700px;
 }
 
 .message {
   font-size: 13px;
-  padding: 3px;
+  margin-bottom: 1px;
 }
 
 .username {
   display: inline-block;
+  font-weight: bold;
+  color: #1F3642;
+  background-color: #efefef;
   width: 300px;
-  padding-right: 20px;
+  padding: 5px;
+  padding-right: 10px;
+  font-size: 12px;
   margin-right: 10px;
   border-right: 1px solid #ccc;
   text-align: right;
   width: 100px;
+
 }
 
 .content {
   display: inline;
   width: 800px;
+
 }
 
 
