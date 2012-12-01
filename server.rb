@@ -50,7 +50,7 @@ class Fireplace < EM::Connection
   persistance Persistance
 
   def post_init
-    @username = "Guest #{rand(0..999)}"
+    @username = "Guest #{rand(999)}"
     add_client
 
     message = {command: "say", username: @username, message: "has entered the room"}
