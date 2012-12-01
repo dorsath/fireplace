@@ -14,8 +14,12 @@ get '/stream' do
   puts "connection made"
 
   stream(:keep_open) do |out|
-    connections[request.ip] ||= Client.new(out)
-    connections[request.ip].add_out(out)
+    if connections[request.ip]
+      connections[request.ip].add_out(out)
+    else
+      connections[request.ip] = Client.new(out)
+    end
+
     out.callback {connections[request.ip].remove_out(out) }
   end
 end

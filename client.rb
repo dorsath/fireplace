@@ -21,16 +21,7 @@ class Echo < EM::Connection
 
   def receive_data(input)
     input.split("\n").each do |line|
-      process_command(JSON.parse(line))
-    end
-  end
-
-  def process_command(data)
-    case data["command"]
-    when "say"
-      @out.outs.each {|out| out << "data: #{data["username"]}: #{data["message"]}\n\n"}
-    else
-      @out.outs.each {|out| out << "data: #{data["username"]}: #{data["message"]}\n\n"}
+      @out << "data: " + line + "\n\n"
     end
   end
 
@@ -58,6 +49,7 @@ end
 class Out
   def initialize(out)
     @outs = [out]
+    @total = []
   end
 
   def outs
@@ -66,13 +58,20 @@ class Out
 
   def add_out(new_out)
     @outs << new_out
+    @total.each do |line|
+      new_out << line
+    end
   end
 
   def remove_out(out)
     @outs.delete(out)
-    @outs.each {|out| out << "data: Someone close his browser\n\n"}
+    @outs.each {|out| out << "data: Someone closed his browser\n\n"}
   end
 
+  def << (data)
+    @total << data
+    @outs.each {|out| out << data}
+  end
 end
 
 
