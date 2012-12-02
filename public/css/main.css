@@ -152,6 +152,14 @@ h2 {
   margin-bottom: 1px;
 }
 
+.announce {
+  background-color: #D9E7FB;
+}
+
+.announce .username{
+  background-color: #D9E7FB;
+}
+
 .username {
   display: inline-block;
   font-weight: bold;

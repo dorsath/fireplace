@@ -14,7 +14,7 @@
   es.onmessage = function(e) {
     if (e.data != ''){
       data = jQuery.parseJSON(e.data)
-      $('#chat').append("<div class='message'><div class='username'>"+ data.username +"</div><div class='content'>"+ data.message +"</div>") ;
+      $('#chat').append("<div class='message "+ data.command +"'><div class='username'>"+ data.username +"</div><div class='content'>"+ data.message +"</div>") ;
       $("html, body").animate({ scrollTop: $(document).height() }, 0);
     }
   }

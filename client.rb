@@ -32,8 +32,6 @@ class Client
     @out = Out.new(out)
     @q = EM::Queue.new
     EM.run {
-
-
       EM.connect("127.0.0.1", 8081, Echo, @q, @out)
     }
   end
@@ -49,9 +47,6 @@ class Client
   def remove_out(out)
     @out.remove_out(out)
   end
-
-
-
 
   def format_input(data)
     if data[0] == "/"

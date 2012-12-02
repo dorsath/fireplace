@@ -59,9 +59,7 @@ class Fireplace < EM::Connection
       push_to_me(line)
     end
 
-    push(message)
-
-    log(message)
+    announce("has entered the room")
   end
 
   def receive_data input
@@ -75,24 +73,17 @@ class Fireplace < EM::Connection
 
     p [self, data]
 
-    log(data)
-
     case data["command"]
-    when "set_username"
-      old_username = @username
-      @username = data["arguments"][0]
-      if old_username
-        say("#{old_username} changed name to #{@username}")
-      else
-        say("New user registered: #{@username}")
-      end
-    when "say"
-      push(data)
+      when "set_username"
+        announce("changed name to #{data["arguments"][0]}")
+        @username = data["arguments"][0]
+      when "say"
+        push(data)
     end
   end
 
-  def say(what)
-    push(command: "say", message: what, username: @username)
+  def announce(what)
+    push(command: "announce", message: what, username: @username)
   end
 
   def log(data)
@@ -105,6 +96,7 @@ class Fireplace < EM::Connection
   end
 
   def push(message)
+    log(message)
     @@clients.each do |instance|
       instance.send_data(message.to_json)
     end
