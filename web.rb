@@ -21,6 +21,9 @@ get '/stream' do
     end
 
     out.callback {connections[request.ip].remove_out(out) }
+    out.errback do
+      connections[request.ip].remove_out(out)
+    end
   end
 end
 
